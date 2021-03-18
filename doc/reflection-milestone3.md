@@ -1,0 +1,8 @@
+## Implemented functions
+Currently, we have five plots. The first three of them are focusing on data visualization and data analyzing. The last two graphs focus on the prediction of the final result and the relationship between prediction and each variable. Like the last dash app, our users can use the first three plots to see and understand the data components and use the last two plots to narrow down their clients' group and get more information on who will buy the product. 
+
+## Improvements from Feedback
+We got lots of feedback from the previous presentation. Based on those feedbacks, we made several new changes. Firstly, we remove the restriction of 5000 lines of data. We are trying to use more extensive data to cover a more comprehensive view. Secondly, we were adding some explanations to each of our graphs. For example, we sorted the second graph based on the counts, but occasionally the several top categories were in age orders. It makes our audience feels like one category in the bottom was putting in the wrong place. Based on the suggestion, we add more sentences on the top to illustrate the order we made it. Also, in our prediction vs. other variable plots, we use different ways to explain our data. To better show the distribution, we change the line plot to a bar plot and the box plot to a distribution plot. 
+
+## Experience in Python & R
+We thought the implementation of the R should be easy and only takes minutes to finish. However, we were facing many troubles when translating code to R. R is more suitable for data analyzing, and the ggplot can easily combine two or more plots. However, it is hard to make groups in R, and we have to use tidyverse to subset the data. Python is much easier to call a portion of data than in R.
