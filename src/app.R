@@ -12,10 +12,10 @@ library(tidyverse)
 
 
 ##### Data
-df <- read.csv(file = 'bank.csv', stringsAsFactors = FALSE)
-df.g <- read.csv(file = 'bank_group.csv', stringsAsFactors = FALSE)
-df.n <- read.csv(file = 'bank_numeric.csv', stringsAsFactors = FALSE)
-df.c <- read.csv(file = 'bank_categorical.csv', stringsAsFactors = FALSE)
+df <- read.csv(file = 'data/processed/bank.csv', stringsAsFactors = FALSE)
+df.g <- read.csv(file = 'data/processed/bank_group.csv', stringsAsFactors = FALSE)
+df.n <- read.csv(file = 'data/processed/bank_numeric.csv', stringsAsFactors = FALSE)
+df.c <- read.csv(file = 'data/processed/bank_categorical.csv', stringsAsFactors = FALSE)
 
 
 
@@ -132,22 +132,28 @@ app$layout(
             ),
             
             
-            
-            
-            
-            
-            
             # TAB 4
             dbcTab(
               list(
+                # DROPDOWN MENU - X AXIS - CATEGORICAL
+                htmlBr(),
+                htmlLabel("Select values for numerical variables to see their performance in prediction"),
+                htmlBr(),
+                htmlLabel("* Hover over the plot to see counts in different categories"),
+                htmlBr(),
+                htmlLabel('Categorical Variables'),
+                dccDropdown(
+                  id='bar-x',
+                  options = df.c %>%
+                    colnames %>%
+                    purrr::map(function(col) list(label = col, value = col)), 
+                  value='Type.of.Job'),
                 
+                # PLOT 4 - numerical prediction plot
+                dccGraph(id = 'barplot_predict'),
+                htmlBr()
 
-                
-                
-                
-                
-                
-              ), label = 'PLOT 4'
+              ), label = 'Categorical Value Prediction'
             ),
             
             
@@ -157,15 +163,29 @@ app$layout(
             # TAB 5
             dbcTab(
               list(
+                htmlBr(),
+                htmlLabel("Select values from numerical values to see the distribution in subscribe or non-subscribe group"),
+                htmlBr(),
+                htmlLabel("* Hover over the plot to see counts in different categories"),
+                htmlBr(),
+                # DROPDOWN MENU - Y AXIS - NUMERICAL
+                htmlLabel('Numerical Variables'),
+                dccDropdown(
+                  id='line-x',
+                  options = df.n %>%
+                    colnames %>%
+                    purrr::map(function(col) list(label = col, value = col)), 
+                  value='Age'),
+                
+                # PLOT 4 - numerical prediction plot
+                dccGraph(id = 'lineplot_predict'),
+                htmlBr()
                 
                 
                 
                 
                 
-                
-                
-                
-              ), label = 'PLOT 5'
+              ), label = 'Numerical Value Prediction'
             )
           
             
@@ -347,19 +367,65 @@ app$callback(
 
 
 
-##### PLOT 4 - Donut Charts
+##### PLOT 4 - Bar Plot
 
-
-
-
-
+app$callback(
+  output('barplot_predict','figure'),
+  list(input('bar-x', 'value')),
+  function(xcol){
+    select_df_yes <- df %>% filter(Predicted.Subscription..current.=="yes")
+    select_df_no <- df %>% filter(Predicted.Subscription..current.=="no")
+    
+    p2 <- ggplot(select_df_yes,
+                aes(x = !!sym(xcol),fill = !!sym(xcol))) +
+      geom_bar(stat='count')+
+      xlab("Subscribe the Term Deposite")+
+      ylim(0, 1000)+
+      theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),legend.position = "none") +
+      ggthemes::scale_color_tableau()
+    
+    p1 <- ggplot(select_df_no,
+                aes(x = !!sym(xcol),fill = !!sym(xcol))) +
+      geom_bar(stat='count')+
+      xlab("NOT Subscribe the Term Deposite")+
+      ylim(0, 1000)+
+      ggthemes::scale_color_tableau()+
+      theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),legend.position = "none")
+    
+   
+    subplot(ggplotly(p1,width=1000, height=400), ggplotly(p2,width=1000, height=400), shareY = TRUE,titleX=TRUE)
+  }
+)
 
 
 
 
 ##### PLOT 5 - Donut Charts
 
-
+app$callback(
+  output('lineplot_predict','figure'),
+  list(input('line-x', 'value')),
+  function(xcol){
+    select_df_yes <- df %>% filter(Predicted.Subscription..current.=="yes")
+    select_df_no <- df %>% filter(Predicted.Subscription..current.=="no")
+    p2 <- ggplot(select_df_yes,
+                 aes(x = !!sym(xcol))) +
+      geom_bar()+
+      xlab("Subscribe the Term Deposite")+
+      theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),legend.position = "none") +
+      ggthemes::scale_color_tableau()
+    
+    p1 <- ggplot(select_df_no,
+                 aes(x = !!sym(xcol))) +
+      geom_bar()+
+      xlab("NOT Subscribe the Term Deposite")+
+      ggthemes::scale_color_tableau()+
+      theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),legend.position = "none")
+    
+    
+    subplot(ggplotly(p1,width=1000, height=400), ggplotly(p2,width=1000, height=400), shareY = TRUE,titleX=TRUE)
+  }
+)
 
 
 
